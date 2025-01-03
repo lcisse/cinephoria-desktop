@@ -1,0 +1,14 @@
+{
+  "name": "cinephoria-desktop",
+  "version": "1.0.0",
+  "description": "Cinéphoria - App bureautique",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Lamine",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^33.2.1"
+  }
+}
