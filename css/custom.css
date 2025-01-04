@@ -1,0 +1,25 @@
+#topMenuBtns {
+    position: absolute;
+    right: 20px;
+}
+
+.topMenuBtn {
+    border: none;
+    outline: none;
+    background: transparent;
+    margin: 0 5px;
+    color: #4e73df;
+    -webkit-app-region: no-drag;
+}
+
+#topMenu {
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+}
+
+
+/** page connexion **/
+#content-page-connexion {
+    height: 100vh;
+}
+/** Fin page connexion **/
