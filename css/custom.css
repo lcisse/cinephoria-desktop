@@ -1,3 +1,37 @@
+:root {
+    --cn-color-green-1: #0F3C44;
+    --cn-color-green-2: #035f70;
+    --cn-color-blue-1: #00C7F8;
+    --cn-color-grey-1: #F1F2F7;
+    --cn-color-grey-2: #d4d5da;
+    --cn-color-white-1: #F1F2F7;
+    --cn-color-orange-1: #DE7420;
+    --cn-color-orange-2: #FD8F3B;
+}
+
+@font-face {
+    font-family: 'Roboto-Italic';
+    src: url('public/assets/fonts/Roboto-Italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body{
+    font-family: 'Sofia Sans Extra Condensed', sans-serif !important;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid var(--cn-color-grey-2) !important;
+}
+
+#form2Example17:focus, #form2Example27:focus {
+    border: 1px solid var(--cn-color-green-3) !important;
+    /*border-color: var(--cn-color-green-3) !important;*/
+    box-shadow: 0 0 0 0.1rem rgb(210 232 227 / 67%);
+}
+
 #topMenuBtns {
     position: absolute;
     right: 20px;
@@ -21,5 +55,18 @@
 /** page connexion **/
 #content-page-connexion {
     height: 100vh;
+    background-color: var(--cn-color-green-1);
 }
+
+#img-connexion {
+    height: 100%; 
+    display: flex;
+}
+
+#img-connexion img {
+    height: 100%; 
+    width: auto; 
+    object-fit: cover; 
+    border-radius: 1rem 0 0 1rem; 
+  }
 /** Fin page connexion **/

@@ -10,5 +10,9 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^33.2.1"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "mysql2": "^3.12.0"
   }
 }

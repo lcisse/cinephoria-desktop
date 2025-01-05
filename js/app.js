@@ -16,3 +16,21 @@ sizeBtn.addEventListener("click", () => {
 closeBtn.addEventListener("click", () => {
   ipc.send("closeApp");
 });
+
+// Fonctionnalités liées à la connexion
+document.getElementById('login-btn').addEventListener('click', () => {
+    const email = document.getElementById('form2Example17').value;
+    const password = document.getElementById('form2Example27').value;
+    console.log(email, password);
+  
+    ipc.send('login', { email, password });
+  
+    ipc.on('login-success', () => {
+      alert('Connexion réussie !');
+    });
+  
+    ipc.on('login-failed', (event, message) => {
+      alert(`Erreur : ${message}`);
+    });
+  });
+  

@@ -14,3 +14,9 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   
 })
+/*indow.addEventListener('DOMContentLoaded', () => {
+  const isLoggedIn = localStorage.getItem('isLoggedIn');
+  if (!isLoggedIn && window.location.pathname !== '/connexion.html') {
+    window.location.href = 'connexion.html'; // Redirige vers la page de connexion
+  }
+});*/
