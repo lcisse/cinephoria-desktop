@@ -58,24 +58,24 @@
           >
         </li>
 
-        <!-- Divider -->
-        <hr class="sidebar-divider" />
+        <!-- Divider
+        <hr class="sidebar-divider" /> -->
 
         <!-- Nav Item - Tables -->
-        <li class="nav-item">
+        <!--<li class="nav-item">
           <a class="nav-link" href="rooms.html">
             <i class="fas fa-fw fa-table"></i>
             <span>Tables</span></a
           >
-        </li>
-        <!-- Divider -->
-        <hr class="sidebar-divider" />
+        </li>-->
+        <!-- Divider 
+        <hr class="sidebar-divider" />-->
 
         <!-- Nav Item - Tables -->
         <li class="nav-item">
-          <a class="nav-link" href="connexion.html">
+          <a id="logout-btn" class="nav-link" href="">
             <i class="fas fa-fw fa-table"></i>
-            <span>Se connecter</span></a
+            <span>Se déconnecter</span></a
           >
         </li>
 
@@ -169,6 +169,15 @@
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
     <script src="js/app.js"></script>
+    <script>
+      window.onload = () => {
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        if (!isLoggedIn) {
+          window.location.href = 'connexion.html';
+        }
+      };
+    </script>
+    
 
     <!-- Page level plugins -->
     <!-- <script src="vendor/datatables/jquery.dataTables.min.js"></script>

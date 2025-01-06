@@ -162,6 +162,15 @@
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
     <script src="js/app.js"></script>
+    <script>
+      window.onload = () => {
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        if (!isLoggedIn) {
+          window.location.href = 'connexion.html';
+        }
+      };
+    </script>
+    
 
     <!-- Page level plugins -->
     <!-- <script src="vendor/datatables/jquery.dataTables.min.js"></script>

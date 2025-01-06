@@ -56,37 +56,52 @@ const createWindow = () => {
   ipc.on('login', async (event, credentials) => {
     const { email, password } = credentials;
   
+    if (!email || !password) {
+      event.reply('login-failed', 'Veuillez renseigner tous les champs.');
+      return;
+    }
+  
     try {
       const [rows] = await db.query(
         'SELECT * FROM users WHERE email = ? AND role = ?',
         [email, 'employee']
       );
-
-      if (rows.length > 0) {
-        const user = rows[0];
-        let storedPasswordHash = user.password;
-
-        if (storedPasswordHash.startsWith('$2y$')) {
-          storedPasswordHash = storedPasswordHash.replace('$2y$', '$2b$');
-        }
-        
-        const isPasswordValid = await bcrypt.compare(password, storedPasswordHash);
-
-        if (isPasswordValid) { 
-          event.reply('login-success');
-          win.webContents.executeJavaScript(`localStorage.setItem('isLoggedIn', 'true');`);
-          win.loadFile('index.html'); // Redirige vers la page principale
-        } else {
-          event.reply('login-failed', 'Mot de passe incorrect');
-        }
+  
+      if (rows.length === 0) {
+        event.reply('login-failed', 'Mot de passe ou email incorrect.');
+        return;
+      }
+  
+      const user = rows[0];
+      let storedPasswordHash = user.password;
+  
+      if (storedPasswordHash.startsWith('$2y$')) {
+        storedPasswordHash = storedPasswordHash.replace('$2y$', '$2b$');
+      }
+  
+      const isPasswordValid = await bcrypt.compare(password, storedPasswordHash);
+  
+  
+      if (isPasswordValid) {
+        event.reply('login-success');
+        win.webContents.executeJavaScript(`localStorage.setItem('isLoggedIn', 'true');`);
+        win.loadFile('index.html'); // Redirige vers la page principale
       } else {
-        event.reply('login-failed', 'Utilisateur non trouvé ou non autorisé');
+        event.reply('login-failed', 'Mot de passe ou email incorrect.');
       }
     } catch (error) {
       console.error('Erreur lors de la connexion :', error);
-      event.reply('login-failed', 'Erreur interne');
+      event.reply('login-failed', 'Une erreur interne est survenue.');
     }
   });
+
+  // Gestion de la déconnexion
+  ipc.on('logout', () => {
+    win.webContents.executeJavaScript(`localStorage.removeItem('isLoggedIn');`);
+  
+    win.loadFile('connexion.html');
+  });
+  
 };
 
 app.whenReady().then(() => {
