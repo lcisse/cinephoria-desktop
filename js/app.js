@@ -1,5 +1,5 @@
-const { ipcRenderer } = require('electron')
-const ipc = ipcRenderer
+const { ipcRenderer } = require("electron");
+const ipc = ipcRenderer;
 
 const reduceBtn = document.getElementById("reduceBtn");
 const sizeBtn = document.getElementById("sizeBtn");
@@ -17,53 +17,224 @@ closeBtn.addEventListener("click", () => {
   ipc.send("closeApp");
 });
 
+function showNotification(message, type = "error") {
+  const notifications = document.querySelectorAll(".notification");
 
+  notifications.forEach((notification) => {
+    const notificationMessage = notification.querySelector(".notification-message");
 
-// Gestion notification formulaire de connexion
-function showNotification(message, type = 'error') {
-  const notification = document.getElementById('notification');
-  const notificationMessage = document.getElementById('notification-message');
+    if (notificationMessage) {
+      notificationMessage.textContent = message; 
+      notification.classList.add(type); 
+      notification.style.opacity = "1"; 
 
-  notificationMessage.textContent = message;
-  notification.className = type; // classe "success" ou "error"
-  notification.style.opacity = '1';
-  notification.style.opacity = '1';
-
-  setTimeout(() => {
-    notification.style.opacity = '0';
-    setTimeout(() => {
-      notification.style.opacity = '0';
-    }, 300); // temps de transition
-  }, 5000); // Affiche la notification 
+      setTimeout(() => {
+        notification.style.opacity = "0";
+        setTimeout(() => {
+          notification.classList.remove(type); 
+        }, 300); // Temps de transition
+      }, 3000);
+    }
+  });
 }
 
+
 // Fonctionnalités liées à la connexion
-if(document.getElementById('login-btn')) { 
-  document.getElementById('login-btn').addEventListener('click', () => {
-      const email = document.getElementById('form2Example17').value;
-      const password = document.getElementById('form2Example27').value;
+if (document.getElementById("login-btn")) {
+  document.getElementById("login-btn").addEventListener("click", () => {
+    const email = document.getElementById("form2Example17").value;
+    const password = document.getElementById("form2Example27").value;
 
-      if (!email || !password) {
-        showNotification('Veuillez renseigner tous les champs !', 'error');
-        return;
-      }
+    if (!email || !password) {
+      showNotification("Veuillez renseigner tous les champs !", "error");
+      return;
+    }
 
-    ipc.send('login', { email, password });
-    
-    
-      ipc.once('login-success', () => {
-        console.log('Connexion réussie !');
-      });
-    
-      ipc.once('login-failed', (event, message) => {
-        showNotification(message, 'error');
-      });
+    ipc.send("login", { email, password });
+
+    ipc.once("login-success", () => {
+      console.log("Connexion réussie !");
+    });
+
+    ipc.once("login-failed", (event, message) => {
+      showNotification(message, "error");
+    });
   });
 }
 
 // Fonctionnalité de déconnexion
-if(document.getElementById('logout-btn')) { 
-  document.getElementById('logout-btn').addEventListener('click', () => {
-    ipc.send('logout');
+if (document.getElementById("logout-btn")) {
+  document.getElementById("logout-btn").addEventListener("click", () => {
+    ipc.send("logout");
   });
 }
+
+// ********* Gestion des incidents
+ipc.send("get-rooms"); // Demande les données des salles au chargement de la page
+
+ipc.on("rooms-data", (event, rooms) => {
+  const tableBody = document.querySelector("#cinemas_list tbody");
+
+  if (tableBody) {
+    tableBody.innerHTML = ""; // Réinitialise le tableau
+  }
+
+  rooms.forEach((room) => {
+    const row = `
+      <tr class="room-row">
+        <td>${room.cinema_name}</td>
+        <td>${room.room_number}</td>
+        <td>${room.incident_notes || "Aucun incident signalé"}</td>
+        <td>
+          <button class="btn incident-btn" id="incident-btn" type="button" data-room-id="${room.id}" data-bs-toggle="modal" data-bs-target="#modal-incident">Signaler un Incident</button> 
+          <button class="btn update-btn" id="update-btn" type="button" data-room-id="${room.id}" data-bs-toggle="modal" data-bs-target="#modal-incident-update">Modifier</button>
+          <button class="btn delete-btn" id="delete-btn" type="button" data-room-id="${room.id}"><i class="fa fa-trash" aria-hidden="true"></i></button>
+        </td>
+      </tr>
+    `;
+
+    if (tableBody) {
+      tableBody.insertAdjacentHTML("beforeend", row);
+    }
+  });
+
+  // Réinitialise les gestionnaires d'événements
+  initializeIncidentHandlers();
+});
+
+ipc.on("rooms-error", (event, message) => {
+  console.error(message);
+});
+
+// Initialise les gestionnaires d'événements pour les boutons "ajouter un Incident" et "Modifier"
+function initializeIncidentHandlers() {
+  // Gestion des boutons "Signaler un Incident"
+  document.querySelectorAll(".incident-btn").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      const roomId = event.target.getAttribute("data-room-id");
+      console.log("Bouton Signaler un Incident cliqué, roomId :", roomId);
+      
+      // Réinitialise le champ texte du modal
+      const incidentInput = document.getElementById("new-incident");
+      incidentInput.value = ""; // Vide le champ texte
+
+      incidentInput.setAttribute("data-room-id", roomId); // Associe le roomId
+    });
+  });
+
+  // Gestion des boutons "Ajouter un Incident"
+  document.querySelector("#modal-incident .btn").addEventListener("click", () => {
+    const incidentDescription = document.getElementById("new-incident").value;
+    const roomId = document
+      .getElementById("new-incident")
+      .getAttribute("data-room-id");
+  
+    if (!incidentDescription) {
+      showNotification("Veuillez décrire l'incident.");
+      return;
+    }
+  console.log(incidentDescription, "*****" + roomId);
+    ipc.send("add-incident", { roomId, incidentDescription });
+  });
+
+  // Gestion des boutons "Modifier"
+  document.querySelectorAll(".update-btn").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      const roomId = event.target.getAttribute("data-room-id");
+      console.log("Bouton Modifier cliqué, roomId :", roomId);
+      ipc.send("get-incident", roomId); // Demande les données de l'incident
+    });
+  });
+
+  // Gestion des boutons "Supprimer"
+  let roomIdToDelete = null; // Variable pour stocker l'ID de la salle à supprimer
+  document.querySelectorAll(".delete-btn").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      const roomId = event.currentTarget.getAttribute("data-room-id");
+      roomIdToDelete = roomId;
+
+      // Affiche la modal de confirmation
+      const modalElement = document.getElementById("modal-confirm-delete");
+      const modalInstance = new bootstrap.Modal(modalElement);
+      modalInstance.show();
+    });
+  });
+
+  // Gestion du clic sur le bouton "Confirmer la suppression"
+  document.getElementById("confirm-delete-btn").addEventListener("click", () => {
+    if (roomIdToDelete) {
+      ipc.send("delete-incident", roomIdToDelete); // Envoie la requête pour supprimer l'incident
+      roomIdToDelete = null; 
+    }
+
+    const modalElement = document.getElementById("modal-confirm-delete");
+    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+    modalInstance.hide();
+  });
+
+}
+
+// Gestion modal "Signaler un Incident"
+ipc.on("incident-added", (event, message) => {
+  ipc.send("get-rooms"); // Recharge la liste des salles après l'ajout
+  const modalElement = document.querySelector("#modal-incident");
+  const modalInstance = bootstrap.Modal.getInstance(modalElement);
+  showNotification("Incident ajouté avec succès", "success");
+  setTimeout(() => {
+    modalInstance.hide(); 
+  }, 3000);
+});
+
+ipc.on("incident-error", (event, message) => {
+  showNotification(message, "error");
+});
+
+
+// Gestion des données reçues pour préremplir le formulaire de mise à jour
+ipc.on("incident-data", (event, incident) => {
+  const incidentDescription = document.getElementById("new-incident-update");
+  incidentDescription.value = incident.incident_notes || ""; 
+  incidentDescription.setAttribute("data-room-id", incident.id); // Associe l'ID de la salle au champ
+});
+
+// Gestionnaire pour la mise à jour de l'incident
+document.querySelector("#update-incident-btn").addEventListener("click", () => {
+  const incidentDescription = document.getElementById("new-incident-update").value;
+  const roomId = document.getElementById("new-incident-update").getAttribute("data-room-id");
+
+  if (!incidentDescription) {
+    showNotification("Veuillez décrire l'incident.");
+    return;
+  }
+
+  console.log("Mise à jour de l'incident :", { roomId, incidentDescription });
+  ipc.send("update-incident", { roomId, incidentDescription });
+});
+
+ipc.on("incident-updated", (event, message) => {
+  ipc.send("get-rooms"); // Recharge la liste des salles après la mise à jour
+  const modalElement = document.querySelector("#modal-incident-update");
+  const modalInstance = bootstrap.Modal.getInstance(modalElement);
+  showNotification("Incident mis à jour avec succès", "success");
+  setTimeout(() => {
+    modalInstance.hide(); 
+  }, 3000);
+});
+
+ipc.on("incident-update-error", (event, message) => {
+  console.error("Erreur lors de la mise à jour :", message);
+  showNotification(message);
+});
+
+
+// Gestion de la réponse après suppression
+ipc.on("incident-deleted", (event, message) => {
+  console.log(message);
+  ipc.send("get-rooms"); // Recharge la liste des salles
+  showNotification(message, "success");
+});
+
+ipc.on("incident-delete-error", (event, message) => {
+  console.error(message);
+  showNotification(message, "error");
+});

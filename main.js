@@ -30,12 +30,10 @@ const createWindow = () => {
   // Gestion des demandes IPC
   // Top menu
   ipc.on("reduceApp", () => {
-    console.log("reduceApp");
     win.minimize();
   });
 
   ipc.on("sizeApp", () => {
-    console.log("sizeApp");
     if (win.isMaximized()) {
       win.restore();
     } else {
@@ -44,7 +42,6 @@ const createWindow = () => {
   });
 
   ipc.on("closeApp", () => {
-    console.log("closeApp");
     win.close();
   });
 
@@ -101,6 +98,96 @@ const createWindow = () => {
   
     win.loadFile('connexion.html');
   });
+
+  // Gestion des incidents, select et update
+  ipc.on('get-rooms', async (event) => {
+    try {
+
+      const [rows] = await db.query(`
+            SELECT r.id, c.cinema_name, r.room_number, r.incident_notes
+            FROM rooms r
+            JOIN cinemas c ON r.cinema_id = c.id
+      `);
+  
+      event.reply('rooms-data', rows); // Envoie les données au renderer process
+
+    } catch (error) {
+      console.error('Erreur lors de la récupération des salles :', error);
+      event.reply('rooms-error', 'Impossible de récupérer les informations des salles.');
+    }
+  });
+
+  ipc.on('add-incident', async (event, data) => {
+    const { roomId, incidentDescription } = data;
+  
+    try {
+      await db.query(
+        'UPDATE rooms SET incident_notes = ? WHERE id = ?',
+        [incidentDescription, roomId]
+      );
+  
+      event.reply('incident-added', 'Incident ajouté avec succès.');
+
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de l\'incident :', error);
+      event.reply('incident-error', 'Impossible d\'ajouter l\'incident.');
+    }
+  });
+
+  // Récupère les données d'une salle pour la mise à jour
+  ipc.on("get-incident", async (event, roomId) => {
+    try {
+      const [rows] = await db.query(
+        "SELECT id, incident_notes FROM rooms WHERE id = ?",
+        [roomId]
+      );
+      console.log(rows);
+      if (rows.length > 0) {
+        event.reply("incident-data", rows[0]); // Envoie les données de la salle au renderer process
+      } else {
+        event.reply("incident-update-error", "Salle non trouvée.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des données de la salle :", error);
+      event.reply("incident-update-error", "Erreur lors de la récupération des données.");
+    }
+  });
+
+  // Met à jour un incident
+  ipc.on("update-incident", async (event, data) => {
+    const { roomId, incidentDescription } = data;
+
+    try {
+      await db.query(
+        "UPDATE rooms SET incident_notes = ? WHERE id = ?",
+        [incidentDescription, roomId]
+      );
+      event.reply("incident-updated", "Incident mis à jour avec succès.");
+
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de l'incident :", error);
+      event.reply("incident-update-error", "Impossible de mettre à jour l'incident.");
+    }
+  });
+
+  // Suppression d'un incident
+  ipc.on("delete-incident", async (event, roomId) => {
+    try {
+      const [result] = await db.query("UPDATE rooms SET incident_notes = NULL WHERE id = ?", [roomId]);
+
+      if (result.affectedRows > 0) {
+        console.log(`Incident supprimé pour la salle ${roomId}`);
+        event.reply("incident-deleted", "Incident supprimé avec succès.");
+      } else {
+        console.error(`Aucun incident trouvé pour la salle ${roomId}`);
+        event.reply("incident-delete-error", "Aucun incident trouvé pour cette salle.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'incident :", error);
+      event.reply("incident-delete-error", "Impossible de supprimer l'incident.");
+    }
+  });
+  
   
 };
 

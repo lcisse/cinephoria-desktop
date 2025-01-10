@@ -2,6 +2,7 @@
     --cn-color-green-1: #0F3C44;
     --cn-color-green-2: #035f70;
     --cn-color-blue-1: #00C7F8;
+    --cn-color-blue-2: #4e73df;
     --cn-color-grey-1: #F1F2F7;
     --cn-color-grey-2: #d4d5da;
     --cn-color-white-1: #F1F2F7;
@@ -72,7 +73,7 @@ textarea {
 
 
 
-  #notification {
+  .notification {
     display: flex;
     align-items: center;
     width: 100%;
@@ -80,16 +81,36 @@ textarea {
     border-radius: 5px;
     transition: opacity 0.3s ease-in-out;
   }
-  #notification-message {
+  .notification-message {
     display: block;
     font-size: 1rem;
     color: var(--cn-color-white-1);
     padding: 20px 10px;
   }
-  #notification.success {
+  .notification.success {
     background-color: #4caf50; /* Vert pour les succès */
   }
-  #notification.error {
+  .notification.error {
     background-color: #f44336; 
   }
 /** Fin page connexion **/
+
+/** page connexion **/
+#incident-btn {
+  color: var(--cn-color-orange-1);
+  font-weight: bold;
+}
+
+#incident-btn:hover {
+  color: var(--cn-color-orange-2);
+}
+
+#update-btn {
+  color: var(--cn-color-blue-2);
+  font-weight: bold;
+}
+
+#update-btn:hover {
+  color: var(--cn-color-blue-1);
+}
+/** fin page connexion **/
