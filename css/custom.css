@@ -1,6 +1,7 @@
 :root {
     --cn-color-green-1: #0F3C44;
     --cn-color-green-2: #035f70;
+    --cn-color-green-3: #d2e8e3;
     --cn-color-blue-1: #00C7F8;
     --cn-color-blue-2: #4e73df;
     --cn-color-grey-1: #F1F2F7;
@@ -21,6 +22,10 @@ body{
     font-family: 'Sofia Sans Extra Condensed', sans-serif !important;
 }
 
+h1, h2 {
+  color: var(--cn-color-green-1);
+}
+
 input,
 select,
 textarea {
@@ -33,6 +38,11 @@ textarea {
     box-shadow: 0 0 0 0.1rem rgb(210 232 227 / 67%);
 }
 
+.hidden-logo {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
 #topMenuBtns {
     position: absolute;
     right: 20px;
@@ -43,7 +53,7 @@ textarea {
     outline: none;
     background: transparent;
     margin: 0 5px;
-    color: #4e73df;
+    color: var(--cn-color-green-2);
     -webkit-app-region: no-drag;
 }
 
@@ -52,6 +62,25 @@ textarea {
     -webkit-app-region: drag;
 }
 
+.dropdown-toggle {
+  background: var(--cn-color-green-2);
+  color: var(--cn-color-white-1);
+}
+.btn.dropdown-toggle:hover {
+  background: var(--cn-color-green-1);
+ opacity: 0.8;
+ color: var(--cn-color-white-1);
+}
+
+.btn.dropdown-toggle:focus {
+  background: var(--cn-color-green-2);
+  box-shadow: 0 0 0 0;
+}
+
+.filter-cinema.active, .filter-cinema:focus {
+  background: var(--cn-color-green-3);
+  color: var(--cn-color-green-1);
+}
 
 /** page connexion **/
 #content-page-connexion {
@@ -95,7 +124,34 @@ textarea {
   }
 /** Fin page connexion **/
 
-/** page connexion **/
+/** page incidents (index) **/
+.bg-gradient-primary {
+  background-color: #0F3C44;
+  background-image: linear-gradient(180deg, #035f70 10%, #0F3C44 100%);
+  background-size: cover;
+}
+
+.sidebar .nav-item .nav-link span {
+  font-size: 1rem;
+}
+
+.title-dropdown {
+  display: flex;
+  justify-content: space-between;
+}
+
+thead tr th {
+  color: var(--cn-color-green-1);
+}
+
+.table-warning  {
+  color: var(--cn-color-orange-1) !important;
+}
+
+#delete-btn:hover .fa.fa-trash {
+  color: var(--cn-color-orange-1);
+}
+
 #incident-btn {
   color: var(--cn-color-orange-1);
   font-weight: bold;
@@ -111,6 +167,6 @@ textarea {
 }
 
 #update-btn:hover {
-  color: var(--cn-color-blue-1);
+  opacity: 0.8;
 }
-/** fin page connexion **/
+/** fin page incidents (index) **/

@@ -188,7 +188,28 @@ const createWindow = () => {
     }
   });
   
-  
+  // Gestion du filtrage des salles
+  ipc.on('filter-rooms', async (event, cinemaName) => {
+    try {
+      let query = `
+        SELECT r.id, c.cinema_name, r.room_number, r.incident_notes
+        FROM rooms r
+        JOIN cinemas c ON r.cinema_id = c.id
+      `;
+      const params = [];
+
+      if (cinemaName !== 'all') {
+        query += ' WHERE c.cinema_name = ?';
+        params.push(cinemaName);
+      }
+
+      const [rows] = await db.query(query, params);
+      event.reply('filtered-rooms-data', rows);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des salles filtrées :', error);
+      event.reply('rooms-error', 'Impossible de récupérer les informations des salles.');
+    }
+  });
 };
 
 app.whenReady().then(() => {

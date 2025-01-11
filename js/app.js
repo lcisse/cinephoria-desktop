@@ -38,6 +38,14 @@ function showNotification(message, type = "error") {
   });
 }
 
+//Bouton toggle
+if(document.getElementById("sidebarToggle")) {
+  document.getElementById("sidebarToggle").addEventListener("click", () => {
+    const logo = document.getElementById("sidebar-logo");
+    logo.classList.toggle("hidden-logo");
+  });
+}
+
 
 // Fonctionnalités liées à la connexion
 if (document.getElementById("login-btn")) {
@@ -80,11 +88,12 @@ ipc.on("rooms-data", (event, rooms) => {
   }
 
   rooms.forEach((room) => {
+    const incidentClass = room.incident_notes ? "table-warning" : "";
     const row = `
       <tr class="room-row">
         <td>${room.cinema_name}</td>
         <td>${room.room_number}</td>
-        <td>${room.incident_notes || "Aucun incident signalé"}</td>
+        <td class="${incidentClass}">${room.incident_notes || "Aucun incident signalé"}</td>
         <td>
           <button class="btn incident-btn" id="incident-btn" type="button" data-room-id="${room.id}" data-bs-toggle="modal" data-bs-target="#modal-incident">Signaler un Incident</button> 
           <button class="btn update-btn" id="update-btn" type="button" data-room-id="${room.id}" data-bs-toggle="modal" data-bs-target="#modal-incident-update">Modifier</button>
@@ -108,40 +117,47 @@ ipc.on("rooms-error", (event, message) => {
 
 // Initialise les gestionnaires d'événements pour les boutons "ajouter un Incident" et "Modifier"
 function initializeIncidentHandlers() {
-  // Gestion des boutons "Signaler un Incident"
-  document.querySelectorAll(".incident-btn").forEach((button) => {
-    button.addEventListener("click", (event) => {
-      const roomId = event.target.getAttribute("data-room-id");
-      console.log("Bouton Signaler un Incident cliqué, roomId :", roomId);
-      
-      // Réinitialise le champ texte du modal
-      const incidentInput = document.getElementById("new-incident");
-      incidentInput.value = ""; // Vide le champ texte
+  const incidentBtn = document.querySelectorAll(".incident-btn");
+  const modalIncidentBtn = document.querySelector("#modal-incident .btn");
+  const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
 
-      incidentInput.setAttribute("data-room-id", roomId); // Associe le roomId
+  // Gestion des boutons "Signaler un Incident"
+  if(incidentBtn) {
+    incidentBtn.forEach((button) => {
+      button.addEventListener("click", (event) => {
+        const roomId = event.target.getAttribute("data-room-id");
+        
+        // Réinitialise le champ texte du modal
+        const incidentInput = document.getElementById("new-incident");
+        incidentInput.value = ""; // Vide le champ texte
+  
+        incidentInput.setAttribute("data-room-id", roomId); // Associe le roomId
+      });
     });
-  });
+  }
 
   // Gestion des boutons "Ajouter un Incident"
-  document.querySelector("#modal-incident .btn").addEventListener("click", () => {
-    const incidentDescription = document.getElementById("new-incident").value;
-    const roomId = document
-      .getElementById("new-incident")
-      .getAttribute("data-room-id");
+  if(modalIncidentBtn) {
+    modalIncidentBtn.addEventListener("click", () => {
+      const incidentDescription = document.getElementById("new-incident").value;
+      const roomId = document
+        .getElementById("new-incident")
+        .getAttribute("data-room-id");
+    
+      if (!incidentDescription) {
+        showNotification("Veuillez décrire l'incident.");
+        return;
+      }
   
-    if (!incidentDescription) {
-      showNotification("Veuillez décrire l'incident.");
-      return;
-    }
-  console.log(incidentDescription, "*****" + roomId);
-    ipc.send("add-incident", { roomId, incidentDescription });
-  });
+      ipc.send("add-incident", { roomId, incidentDescription });
+    });
+  }
 
   // Gestion des boutons "Modifier"
   document.querySelectorAll(".update-btn").forEach((button) => {
     button.addEventListener("click", (event) => {
       const roomId = event.target.getAttribute("data-room-id");
-      console.log("Bouton Modifier cliqué, roomId :", roomId);
+      
       ipc.send("get-incident", roomId); // Demande les données de l'incident
     });
   });
@@ -161,28 +177,30 @@ function initializeIncidentHandlers() {
   });
 
   // Gestion du clic sur le bouton "Confirmer la suppression"
-  document.getElementById("confirm-delete-btn").addEventListener("click", () => {
-    if (roomIdToDelete) {
-      ipc.send("delete-incident", roomIdToDelete); // Envoie la requête pour supprimer l'incident
-      roomIdToDelete = null; 
-    }
-
-    const modalElement = document.getElementById("modal-confirm-delete");
-    const modalInstance = bootstrap.Modal.getInstance(modalElement);
-    modalInstance.hide();
-  });
+  if(confirmDeleteBtn) {
+    document.getElementById("confirm-delete-btn").addEventListener("click", () => {
+      if (roomIdToDelete) {
+        ipc.send("delete-incident", roomIdToDelete); // Envoie la requête pour supprimer l'incident
+        roomIdToDelete = null; 
+      }
+  
+      const modalElement = document.getElementById("modal-confirm-delete");
+      const modalInstance = bootstrap.Modal.getInstance(modalElement);
+      modalInstance.hide();
+    });
+  }
 
 }
 
 // Gestion modal "Signaler un Incident"
 ipc.on("incident-added", (event, message) => {
-  ipc.send("get-rooms"); // Recharge la liste des salles après l'ajout
+  reloadFilteredRooms();
   const modalElement = document.querySelector("#modal-incident");
   const modalInstance = bootstrap.Modal.getInstance(modalElement);
   showNotification("Incident ajouté avec succès", "success");
   setTimeout(() => {
     modalInstance.hide(); 
-  }, 3000);
+  }, 1000);
 });
 
 ipc.on("incident-error", (event, message) => {
@@ -198,27 +216,28 @@ ipc.on("incident-data", (event, incident) => {
 });
 
 // Gestionnaire pour la mise à jour de l'incident
-document.querySelector("#update-incident-btn").addEventListener("click", () => {
-  const incidentDescription = document.getElementById("new-incident-update").value;
-  const roomId = document.getElementById("new-incident-update").getAttribute("data-room-id");
-
-  if (!incidentDescription) {
-    showNotification("Veuillez décrire l'incident.");
-    return;
-  }
-
-  console.log("Mise à jour de l'incident :", { roomId, incidentDescription });
-  ipc.send("update-incident", { roomId, incidentDescription });
-});
+if(document.querySelector("#update-incident-btn")){
+  document.querySelector("#update-incident-btn").addEventListener("click", () => {
+    const incidentDescription = document.getElementById("new-incident-update").value;
+    const roomId = document.getElementById("new-incident-update").getAttribute("data-room-id");
+  
+    if (!incidentDescription) {
+      showNotification("Veuillez décrire l'incident.");
+      return;
+    }
+  
+    ipc.send("update-incident", { roomId, incidentDescription });
+  });
+}
 
 ipc.on("incident-updated", (event, message) => {
-  ipc.send("get-rooms"); // Recharge la liste des salles après la mise à jour
+  reloadFilteredRooms();
   const modalElement = document.querySelector("#modal-incident-update");
   const modalInstance = bootstrap.Modal.getInstance(modalElement);
   showNotification("Incident mis à jour avec succès", "success");
   setTimeout(() => {
     modalInstance.hide(); 
-  }, 3000);
+  }, 1000);
 });
 
 ipc.on("incident-update-error", (event, message) => {
@@ -229,12 +248,75 @@ ipc.on("incident-update-error", (event, message) => {
 
 // Gestion de la réponse après suppression
 ipc.on("incident-deleted", (event, message) => {
-  console.log(message);
-  ipc.send("get-rooms"); // Recharge la liste des salles
   showNotification(message, "success");
+  reloadFilteredRooms();
 });
 
 ipc.on("incident-delete-error", (event, message) => {
   console.error(message);
   showNotification(message, "error");
 });
+
+//    *************************** Gestion du filtre par cinéma ************************* 
+// Gestion du filtrage par cinéma
+document.querySelectorAll('.filter-cinema').forEach((item) => {
+  item.addEventListener('click', (event) => {
+    event.preventDefault(); // Empêche le rechargement de la page
+    const selectedCinema = event.target.getAttribute('data-cinema');
+
+    localStorage.setItem('selectedCinema', selectedCinema);
+
+    ipc.send('filter-rooms', selectedCinema);
+  });
+});
+
+// Réception des données filtrées
+ipc.on('filtered-rooms-data', (event, rooms) => {
+  const tableBody = document.querySelector('#cinemas_list tbody');
+  if (tableBody) {
+    tableBody.innerHTML = ''; // Réinitialise le tableau
+  }
+
+  rooms.forEach((room) => {
+    const incidentClass = room.incident_notes ? "table-warning" : "";
+    const row = `
+      <tr class="room-row">
+        <td>${room.cinema_name}</td>
+        <td>${room.room_number}</td>
+        <td class="${incidentClass}">${room.incident_notes || 'Aucun incident signalé'}</td>
+        <td>
+          <button class="btn incident-btn" id="incident-btn" type="button" data-room-id="${room.id}" data-bs-toggle="modal" data-bs-target="#modal-incident">Signaler un Incident</button> 
+          <button class="btn update-btn" id="update-btn" type="button" data-room-id="${room.id}" data-bs-toggle="modal" data-bs-target="#modal-incident-update">Modifier</button>
+          <button class="btn delete-btn" id="delete-btn" type="button" data-room-id="${room.id}"><i class="fa fa-trash" aria-hidden="true"></i></button>
+        </td>
+      </tr>
+    `;
+
+    if (tableBody) {
+      tableBody.insertAdjacentHTML('beforeend', row);
+    }
+  });
+
+  initializeIncidentHandlers(); // Réinitialise les gestionnaires d'événements
+});
+
+// Appliquer le filtre au chargement de la page
+document.addEventListener('DOMContentLoaded', () => {
+  reloadFilteredRooms();
+});
+
+function reloadFilteredRooms() {
+  const storedFilter = localStorage.getItem('selectedCinema') || 'all';
+ 
+  ipc.send('filter-rooms', storedFilter);
+
+  // Mettre à jour l'interface du menu dropdown pour indiquer le filtre actif
+  const dropdownItems = document.querySelectorAll('.filter-cinema');
+  dropdownItems.forEach((item) => {
+    if (item.getAttribute('data-cinema') === storedFilter) {
+      item.classList.add('active'); // Ajoute une classe "active" pour le style (facultatif)
+    } else {
+      item.classList.remove('active');
+    }
+  });
+}

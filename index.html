@@ -44,7 +44,7 @@
           class="sidebar-brand d-flex align-items-center justify-content-center"
           href="index.html"
         >
-        <img src="img/logo-white.png" alt="Logo de Cinéphoria" class="mb-2" />
+        <img id="sidebar-logo" src="img/logo-white.png" alt="Logo de Cinéphoria" class="mb-2" />
           <!--<div class="sidebar-brand-text mx-3">Cinéphoria</div> -->
         </a>
 
@@ -59,23 +59,10 @@
           >
         </li>
 
-        <!-- Divider
-        <hr class="sidebar-divider" /> -->
-
-        <!-- Nav Item - Tables -->
-        <!--<li class="nav-item">
-          <a class="nav-link" href="rooms.html">
-            <i class="fas fa-fw fa-table"></i>
-            <span>Tables</span></a
-          >
-        </li>-->
-        <!-- Divider 
-        <hr class="sidebar-divider" />-->
-
         <!-- Nav Item - Tables -->
         <li class="nav-item">
           <a id="logout-btn" class="nav-link" href="">
-            <i class="fas fa-fw fa-table"></i>
+            <i class="fas fa-sign-out-alt"></i>
             <span>Se déconnecter</span></a
           >
         </li>
@@ -136,7 +123,24 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
-                        <h2>Gestion des incidents</h2>
+                        <div class="title-dropdown">
+                          <h2>Gestion des incidents</h2>
+                          <div class="dropdown">
+                            <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                              Filtrer par le cinéma
+                            </button>
+                            <ul class="dropdown-menu">
+                              <li><a class="dropdown-item filter-cinema" data-cinema="all" href="#">Tous les cinémas</a></li>
+                              <li><a class="dropdown-item filter-cinema" data-cinema="nantes" href="#">Nantes</a></li>
+                              <li><a class="dropdown-item filter-cinema" data-cinema="bordeaux" href="#">Bordeaux</a></li>
+                              <li><a class="dropdown-item filter-cinema" data-cinema="paris" href="#">Paris</a></li>
+                              <li><a class="dropdown-item filter-cinema" data-cinema="toulouse" href="#">Toulouse</a></li>
+                              <li><a class="dropdown-item filter-cinema" data-cinema="lille" href="#">Lille</a></li>
+                              <li><a class="dropdown-item filter-cinema" data-cinema="charleroi" href="#">Charleroi</a></li>
+                              <li><a class="dropdown-item filter-cinema" data-cinema="liège" href="#">Liège</a></li>
+                            </ul>
+                          </div>
+                        </div>
                         <table class="table table-striped">
                             <thead>
                                 <tr>
