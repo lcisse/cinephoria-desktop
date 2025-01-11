@@ -61,6 +61,7 @@ if (document.getElementById("login-btn")) {
     ipc.send("login", { email, password });
 
     ipc.once("login-success", () => {
+      localStorage.removeItem('selectedCinema');
       console.log("Connexion réussie !");
     });
 
@@ -88,19 +89,7 @@ ipc.on("rooms-data", (event, rooms) => {
   }
 
   rooms.forEach((room) => {
-    const incidentClass = room.incident_notes ? "table-warning" : "";
-    const row = `
-      <tr class="room-row">
-        <td>${room.cinema_name}</td>
-        <td>${room.room_number}</td>
-        <td class="${incidentClass}">${room.incident_notes || "Aucun incident signalé"}</td>
-        <td>
-          <button class="btn incident-btn" id="incident-btn" type="button" data-room-id="${room.id}" data-bs-toggle="modal" data-bs-target="#modal-incident">Signaler un Incident</button> 
-          <button class="btn update-btn" id="update-btn" type="button" data-room-id="${room.id}" data-bs-toggle="modal" data-bs-target="#modal-incident-update">Modifier</button>
-          <button class="btn delete-btn" id="delete-btn" type="button" data-room-id="${room.id}"><i class="fa fa-trash" aria-hidden="true"></i></button>
-        </td>
-      </tr>
-    `;
+    const row = generateTableRow(room);
 
     if (tableBody) {
       tableBody.insertAdjacentHTML("beforeend", row);
@@ -278,19 +267,7 @@ ipc.on('filtered-rooms-data', (event, rooms) => {
   }
 
   rooms.forEach((room) => {
-    const incidentClass = room.incident_notes ? "table-warning" : "";
-    const row = `
-      <tr class="room-row">
-        <td>${room.cinema_name}</td>
-        <td>${room.room_number}</td>
-        <td class="${incidentClass}">${room.incident_notes || 'Aucun incident signalé'}</td>
-        <td>
-          <button class="btn incident-btn" id="incident-btn" type="button" data-room-id="${room.id}" data-bs-toggle="modal" data-bs-target="#modal-incident">Signaler un Incident</button> 
-          <button class="btn update-btn" id="update-btn" type="button" data-room-id="${room.id}" data-bs-toggle="modal" data-bs-target="#modal-incident-update">Modifier</button>
-          <button class="btn delete-btn" id="delete-btn" type="button" data-room-id="${room.id}"><i class="fa fa-trash" aria-hidden="true"></i></button>
-        </td>
-      </tr>
-    `;
+    const row = generateTableRow(room);
 
     if (tableBody) {
       tableBody.insertAdjacentHTML('beforeend', row);
@@ -319,4 +296,22 @@ function reloadFilteredRooms() {
       item.classList.remove('active');
     }
   });
+}
+
+
+// ************************** Fonction pour Générer les rows du tableau *****************
+function generateTableRow(room) {
+  const incidentClass = room.incident_notes ? "table-warning" : "";
+  return `
+    <tr class="room-row">
+      <td>${room.cinema_name}</td>
+      <td>${room.room_number}</td>
+      <td class="${incidentClass}">${room.incident_notes || "Aucun incident signalé"}</td>
+      <td>
+        <button class="btn incident-btn" id="incident-btn" type="button" data-room-id="${room.id}" data-bs-toggle="modal" data-bs-target="#modal-incident">Signaler un Incident</button> 
+        <button class="btn update-btn" id="update-btn" type="button" data-room-id="${room.id}" data-bs-toggle="modal" data-bs-target="#modal-incident-update">Modifier</button>
+        <button class="btn delete-btn" id="delete-btn" type="button" data-room-id="${room.id}"><i class="fa fa-trash" aria-hidden="true"></i></button>
+      </td>
+    </tr>
+  `;
 }
