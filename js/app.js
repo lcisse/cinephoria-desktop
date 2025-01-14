@@ -38,11 +38,21 @@ function showNotification(message, type = "error") {
   });
 }
 
-//Bouton toggle
+//Bouton toggle sidbar
 if(document.getElementById("sidebarToggle")) {
   document.getElementById("sidebarToggle").addEventListener("click", () => {
     const logo = document.getElementById("sidebar-logo");
+    const sidebar = document.getElementById('accordionSidebar');
+    const contentWrapper = document.getElementById('content-wrapper');
+    const content = document.getElementById('content');
+    const  topMenu = document.getElementById('topMenu');
+    
     logo.classList.toggle("hidden-logo");
+
+    sidebar.classList.toggle('reduced');
+    contentWrapper.classList.toggle('reduced');
+    content.classList.toggle('reduced');
+    topMenu.classList.toggle('reduced');
   });
 }
 
@@ -315,3 +325,4 @@ function generateTableRow(room) {
     </tr>
   `;
 }
+

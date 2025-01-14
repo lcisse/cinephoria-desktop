@@ -32,9 +32,56 @@ textarea {
   border: 1px solid var(--cn-color-grey-2) !important;
 }
 
+#wrapper {
+  display: flex; 
+  width: 100%; 
+}
+
+#accordionSidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 17% !important;
+  z-index: 1000;
+}
+
+#content-wrapper {
+  width: 83%;
+  margin-left: 17%;
+  margin-top: 70px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%; 
+  overflow: hidden;
+  transition: width 0.3s ease;
+}
+
+div.connexion-wrapper #content-wrapper {
+  width: 100% !important;
+  margin-left: 0 !important;
+}
+
+#accordionSidebar.reduced {
+  width: 10% !important;
+}
+
+#content-wrapper.reduced {
+  width: 90% !important;
+  margin-left: 10%;
+}
+
+#content {
+  min-height: 80vh;
+}
+
+#content.reduced { 
+  padding: 10px; 
+}
+
 #form2Example17:focus, #form2Example27:focus {
     border: 1px solid var(--cn-color-green-3) !important;
-    /*border-color: var(--cn-color-green-3) !important;*/
     box-shadow: 0 0 0 0.1rem rgb(210 232 227 / 67%);
 }
 
@@ -60,6 +107,19 @@ textarea {
 #topMenu {
     -webkit-user-select: none;
     -webkit-app-region: drag;
+    position: fixed; 
+    top: 0;
+    right: 0;
+    width: calc(90% - 40px); 
+    z-index: 999; 
+}
+
+div.connexion-wrapper #topMenu {
+  width: 100%;
+}
+
+#topMenu.reduced {
+  width: calc(90%) !important; 
 }
 
 .dropdown-toggle {
@@ -98,30 +158,32 @@ textarea {
     width: auto; 
     object-fit: cover; 
     border-radius: 1rem 0 0 1rem; 
-  }
+}
 
 
-
-  .notification {
+.notification {
     display: flex;
     align-items: center;
     width: 100%;
     height: 30px;
     border-radius: 5px;
     transition: opacity 0.3s ease-in-out;
-  }
-  .notification-message {
+}
+
+.notification-message {
     display: block;
     font-size: 1rem;
     color: var(--cn-color-white-1);
     padding: 20px 10px;
-  }
-  .notification.success {
-    background-color: #4caf50; /* Vert pour les succès */
-  }
-  .notification.error {
+}
+
+.notification.success {
+    background-color: #4caf50; 
+}
+  
+.notification.error {
     background-color: #f44336; 
-  }
+}
 /** Fin page connexion **/
 
 /** page incidents (index) **/
@@ -170,3 +232,13 @@ thead tr th {
   opacity: 0.8;
 }
 /** fin page incidents (index) **/
+
+
+@media (max-width: 1150px) {
+  .table tr th.incident-col {
+      width: 40% !important;    
+  }
+  .table tr th.action-col {
+    width: 35% !important;
+  }
+}
