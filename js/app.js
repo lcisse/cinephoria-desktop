@@ -1,5 +1,4 @@
-const { ipcRenderer } = require("electron");
-const ipc = ipcRenderer;
+const ipc = window.electronAPI;
 
 const reduceBtn = document.getElementById("reduceBtn");
 const sizeBtn = document.getElementById("sizeBtn");
@@ -70,8 +69,9 @@ if (document.getElementById("login-btn")) {
 
     ipc.send("login", { email, password });
 
-    ipc.once("login-success", () => {
+    ipc.once("login-success", (event, data) => {
       localStorage.removeItem('selectedCinema');
+      localStorage.setItem('isLoggedIn', 'true');
       console.log("Connexion réussie !");
     });
 
@@ -91,13 +91,14 @@ if (document.getElementById("logout-btn")) {
 // ********* Gestion des incidents
 ipc.send("get-rooms"); // Demande les données des salles au chargement de la page
 
-ipc.on("rooms-data", (event, rooms) => {
+ipc.on("rooms-data", (rooms) => {
   const tableBody = document.querySelector("#cinemas_list tbody");
 
   if (tableBody) {
     tableBody.innerHTML = ""; // Réinitialise le tableau
   }
 
+  
   rooms.forEach((room) => {
     const row = generateTableRow(room);
 
@@ -202,13 +203,13 @@ ipc.on("incident-added", (event, message) => {
   }, 1000);
 });
 
-ipc.on("incident-error", (event, message) => {
+ipc.on("incident-error", (message) => {
   showNotification(message, "error");
 });
 
 
 // Gestion des données reçues pour préremplir le formulaire de mise à jour
-ipc.on("incident-data", (event, incident) => {
+ipc.on("incident-data", (incident) => {
   const incidentDescription = document.getElementById("new-incident-update");
   incidentDescription.value = incident.incident_notes || ""; 
   incidentDescription.setAttribute("data-room-id", incident.id); // Associe l'ID de la salle au champ
@@ -239,19 +240,19 @@ ipc.on("incident-updated", (event, message) => {
   }, 1000);
 });
 
-ipc.on("incident-update-error", (event, message) => {
+ipc.on("incident-update-error", (message) => {
   console.error("Erreur lors de la mise à jour :", message);
   showNotification(message);
 });
 
 
 // Gestion de la réponse après suppression
-ipc.on("incident-deleted", (event, message) => {
+ipc.on("incident-deleted", (message) => {
   showNotification(message, "success");
   reloadFilteredRooms();
 });
 
-ipc.on("incident-delete-error", (event, message) => {
+ipc.on("incident-delete-error", (message) => {
   console.error(message);
   showNotification(message, "error");
 });
@@ -270,7 +271,7 @@ document.querySelectorAll('.filter-cinema').forEach((item) => {
 });
 
 // Réception des données filtrées
-ipc.on('filtered-rooms-data', (event, rooms) => {
+ipc.on('filtered-rooms-data', (rooms) => {
   const tableBody = document.querySelector('#cinemas_list tbody');
   if (tableBody) {
     tableBody.innerHTML = ''; // Réinitialise le tableau
@@ -325,4 +326,6 @@ function generateTableRow(room) {
     </tr>
   `;
 }
+
+
 

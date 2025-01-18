@@ -17,8 +17,8 @@ const createWindow = () => {
     frame: false,
     icon: path.join(__dirname, "./ico.ico"),
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
       devTools: true,
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -80,8 +80,9 @@ const createWindow = () => {
   
   
       if (isPasswordValid) {
-        event.reply('login-success');
-        win.webContents.executeJavaScript(`localStorage.setItem('isLoggedIn', 'true');`);
+        //event.reply('login-success');
+        event.reply('login-success', { isLoggedIn: true });
+        //win.webContents.executeJavaScript(`localStorage.setItem('isLoggedIn', 'true');`);
         win.loadFile('index.html'); // Redirige vers la page principale
       } else {
         event.reply('login-failed', 'Mot de passe ou email incorrect.');
@@ -141,7 +142,7 @@ const createWindow = () => {
         "SELECT id, incident_notes FROM rooms WHERE id = ?",
         [roomId]
       );
-      console.log(rows);
+      
       if (rows.length > 0) {
         event.reply("incident-data", rows[0]); // Envoie les données de la salle au renderer process
       } else {
@@ -176,7 +177,6 @@ const createWindow = () => {
       const [result] = await db.query("UPDATE rooms SET incident_notes = NULL WHERE id = ?", [roomId]);
 
       if (result.affectedRows > 0) {
-        console.log(`Incident supprimé pour la salle ${roomId}`);
         event.reply("incident-deleted", "Incident supprimé avec succès.");
       } else {
         console.error(`Aucun incident trouvé pour la salle ${roomId}`);
