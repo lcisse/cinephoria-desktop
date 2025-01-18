@@ -174,7 +174,7 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                            <button type="button" class="btn" id="add-incident-btn">Ajouter</button>
+                            <button type="button" class="btn add-update" id="add-incident-btn">Ajouter</button>
                             </div>
                         </form>
                     </div>
@@ -186,20 +186,20 @@
           <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
                   <div class="modal-header">
-                      <h1 class="modal-title fs-5" id="modalLabel-incident-update">Ajouter un incident</h1>
+                      <h1 class="modal-title fs-5" id="modalLabel-incident-update">Mise à jour de l'incident</h1>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
                       <form>
                           <div class="mb-3">
-                              <label for="new-incident-update" class="col-form-label">Nouveau incident</label>
+                              <label for="new-incident-update" class="col-form-label">Modifier l'incident</label>
                               <textarea class="form-control" id="new-incident-update" rows="3" required></textarea>
                               <div class="notification">
                                 <span class="notification-message"></span>
                               </div>
                           </div>
                           <div class="modal-footer">
-                            <button type="button" class="btn" id="update-incident-btn">Ajouter</button>
+                            <button type="button" class="btn add-update" id="update-incident-btn">Mettre à jour</button>
                           </div>
                       </form>
                   </div>
@@ -262,6 +262,8 @@
 
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
+    <script src="js/ipcHandlers.js"></script>
+    <script src="js/domUtils.js"></script>
     <script src="js/app.js"></script>
     <script>
       window.onload = () => {

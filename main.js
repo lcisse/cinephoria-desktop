@@ -57,6 +57,12 @@ const createWindow = () => {
       event.reply('login-failed', 'Veuillez renseigner tous les champs.');
       return;
     }
+
+      // Limitation de la longueur des champs pour éviter des attaques par payload volumineux
+    if (email.length > 100 || password.length > 100) {
+      event.reply("login-failed", "Les champs dépassent la longueur autorisée.");
+      return;
+    }
   
     try {
       const [rows] = await db.query(
@@ -94,8 +100,9 @@ const createWindow = () => {
   });
 
   // Gestion de la déconnexion
-  ipc.on('logout', () => {
-    win.webContents.executeJavaScript(`localStorage.removeItem('isLoggedIn');`);
+  ipc.on('logout', (event) => {
+    event.reply('logout-success');
+    //win.webContents.executeJavaScript(`localStorage.removeItem('isLoggedIn');`);
   
     win.loadFile('connexion.html');
   });

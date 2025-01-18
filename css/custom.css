@@ -231,6 +231,17 @@ thead tr th {
 #update-btn:hover {
   opacity: 0.8;
 }
+
+.add-update {
+  background: var(--cn-color-grey-1);
+  color: var(--cn-color-green-1);
+  padding: 4px 16px;
+  margin-left: 10px;
+}
+
+.add-update:hover {
+  background: var(--cn-color-green-3);
+}
 /** fin page incidents (index) **/
 
 
