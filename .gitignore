@@ -4,3 +4,4 @@ dist/
 *.exe
 vendor/
 db.js
+.env
