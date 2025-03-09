@@ -24,7 +24,7 @@ const createWindow = () => {
     },
   });
 
-  win.webContents.openDevTools();
+  //win.webContents.openDevTools();
   win.loadFile('connexion.html'); // Charge la page de connexion par défaut
 
   // Gestion des demandes IPC

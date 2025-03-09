@@ -6,6 +6,14 @@
   "scripts": {
     "start": "electron ."
   },
+  "build": {
+    "extraResources": [
+      {
+        "from": ".env",
+        "to": ".env"
+      }
+    ]
+  },
   "author": "Lamine",
   "license": "ISC",
   "devDependencies": {

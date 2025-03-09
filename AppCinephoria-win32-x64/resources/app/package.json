@@ -1,0 +1,27 @@
+{
+  "name": "cinephoria-desktop",
+  "version": "1.0.0",
+  "description": "Cinéphoria - App bureautique",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "build": {
+    "extraResources": [
+      {
+        "from": ".env",
+        "to": ".env"
+      }
+    ]
+  },
+  "author": "Lamine",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^33.2.1"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
+    "mysql2": "^3.12.0"
+  }
+}
