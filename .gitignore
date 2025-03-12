@@ -3,5 +3,4 @@ dist/
 *.log
 *.exe
 vendor/
-db.js
 .env
