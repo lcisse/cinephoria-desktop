@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron/main');
 const path = require('node:path');
-const db = require('./js/db'); // Module de connexion à la base de données MySQL
+let db = require('./js/db'); // Module de connexion à la base de données MySQL
 const bcrypt = require('bcrypt');
 const ipc = ipcMain;
 
@@ -24,7 +24,7 @@ const createWindow = () => {
     },
   });
 
-  //win.webContents.openDevTools();
+  win.webContents.openDevTools();
   win.loadFile('connexion.html'); // Charge la page de connexion par défaut
 
   // Gestion des demandes IPC
@@ -110,6 +110,7 @@ const createWindow = () => {
   // Gestion des incidents, select et update
   ipc.on('get-rooms', async (event) => {
     try {
+         db = await db; // On attend que la promesse soit résolue
 
       const [rows] = await db.query(`
             SELECT r.id, c.cinema_name, r.room_number, r.incident_notes
