@@ -55,7 +55,7 @@ Ce dépôt contient :
 - Le code source de l'application (ElectronJS)
 - Le système de connexion
 - L’intégration avec la base de données MySQL existante
-- Le packaging avec `electron-builder`
+- Le packaging avec `electron-packager`
 
 ---
 
